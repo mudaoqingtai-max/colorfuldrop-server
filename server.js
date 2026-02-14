@@ -45,12 +45,19 @@ app.post("/api/leaderboard", (req, res) => {
     return res.status(400).json({ error: "name and score required" });
   }
   const board = loadBoard();
+  
+  // ▼▼▼ 修正箇所ここから ▼▼▼
+  // 日本時間(JST)にするため、現在時刻に9時間を足す
+  const jstNow = new Date(Date.now() + 9 * 60 * 60 * 1000);
+  
   board.push({
     name: String(name).slice(0, 12),
     score: Math.floor(score),
     level: level || 1,
-    date: new Date().toISOString().slice(0, 10),
+    date: jstNow.toISOString().slice(0, 10), // 日本時間の日付を取得
   });
+  // ▲▲▲ 修正箇所ここまで ▲▲▲
+
   board.sort((a, b) => b.score - a.score);
   const top = board.slice(0, 50);
   saveBoard(top);
